@@ -1,0 +1,2761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<title>Smart Calculator</title>
+
+<style>
+/* =====================================================
+   THEME
+===================================================== */
+
+:root {
+    --bg: #ffffff;
+    --card: #ffffff;
+    --text: #252525;
+    --muted: #888888;
+    --line: #e8e8e8;
+    --key: #f6f6f6;
+    --accent: #ff7138;
+    --accent-light: #fff0e9;
+    --danger: #ffe9e5;
+}
+
+body.dark {
+    --bg: #111214;
+    --card: #191a1e;
+    --text: #ffffff;
+    --muted: #9b9b9b;
+    --line: #33353a;
+    --key: #26282d;
+    --accent-light: #3b241c;
+    --danger: #3b211d;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.app {
+    width: 100%;
+    max-width: 620px;
+    min-height: 100vh;
+    margin: auto;
+    background: var(--card);
+    padding-bottom: 75px;
+}
+
+
+/* =====================================================
+   TOP BAR
+===================================================== */
+
+.topbar {
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+.logo {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: var(--accent);
+}
+
+.icon-button {
+    width: 42px;
+    height: 42px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 25px;
+    border-radius: 50%;
+}
+
+
+/* =====================================================
+   PAGES
+===================================================== */
+
+.page {
+    padding: 18px;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 22px;
+}
+
+.back {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.back button {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 30px;
+}
+
+.back h2 {
+    font-size: 21px;
+}
+
+
+/* =====================================================
+   BASIC CALCULATOR
+===================================================== */
+
+.calculator {
+    padding: 0 16px 20px;
+}
+
+.display {
+    min-height: 205px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 20px 5px;
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+}
+
+.expression {
+    color: var(--muted);
+    font-size: 20px;
+    min-height: 28px;
+    word-break: break-all;
+}
+
+.result {
+    font-size: 54px;
+    line-height: 1.15;
+    word-break: break-all;
+}
+
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding-top: 15px;
+}
+
+.key {
+    height: 68px;
+    border: none;
+    border-radius: 18px;
+    background: var(--key);
+    color: var(--text);
+    font-size: 23px;
+}
+
+.key:active {
+    transform: scale(.96);
+}
+
+.key.operator {
+    color: var(--accent);
+    font-size: 27px;
+}
+
+.key.ac {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.key.equal {
+    background: var(--accent);
+    color: white;
+}
+
+.key.zero {
+    grid-column: span 2;
+}
+
+
+/* =====================================================
+   SCIENTIFIC
+===================================================== */
+
+.scientific {
+    padding: 10px 12px;
+}
+
+.scientific-display {
+    min-height: 145px;
+}
+
+.scientific-mode {
+    display: flex;
+    gap: 20px;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--muted);
+}
+
+.scientific-mode .active {
+    color: var(--accent);
+}
+
+.scientific-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+}
+
+.scientific-grid .key {
+    height: 53px;
+    border-radius: 12px;
+    font-size: 15px;
+}
+
+.scientific-info {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 15px;
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   SECTION GRID
+===================================================== */
+
+.section-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.section-card {
+    min-height: 105px;
+    border: 1px solid var(--line);
+    border-radius: 17px;
+    background: var(--card);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.04);
+}
+
+.section-card:active {
+    transform: scale(.97);
+}
+
+.section-icon {
+    font-size: 28px;
+}
+
+.section-name {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+
+/* =====================================================
+   FORMS
+===================================================== */
+
+.card {
+    border: 1px solid var(--line);
+    border-radius: 17px;
+    padding: 18px;
+    margin-bottom: 15px;
+}
+
+.card h3 {
+    margin-bottom: 18px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 15px;
+}
+
+.field label {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: bold;
+}
+
+.field input,
+.field select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    outline: none;
+    background: var(--card);
+    color: var(--text);
+    font-size: 16px;
+}
+
+.primary-button {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.output {
+    margin-top: 15px;
+    padding: 17px;
+    border-radius: 12px;
+    background: var(--accent-light);
+    color: var(--accent);
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.swap {
+    display: block;
+    width: 42px;
+    height: 42px;
+    margin: 5px auto 15px;
+    border: none;
+    border-radius: 50%;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 20px;
+}
+
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+.history-item {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px;
+    margin-top: 9px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.history-expression {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.history-result {
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+.clear-history {
+    border: none;
+    background: var(--danger);
+    color: var(--accent);
+    border-radius: 9px;
+    padding: 10px 14px;
+    font-weight: bold;
+}
+
+
+/* =====================================================
+   BOTTOM NAVIGATION
+===================================================== */
+
+.bottom-nav {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: min(620px, 100%);
+    height: 70px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: var(--card);
+    border-top: 1px solid var(--line);
+    z-index: 20;
+}
+
+.nav-button {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+}
+
+.nav-button span {
+    font-size: 22px;
+}
+
+.nav-button small {
+    font-size: 11px;
+}
+
+.nav-button.active {
+    color: var(--accent);
+}
+
+
+/* =====================================================
+   DRAWER
+===================================================== */
+
+.drawer {
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 290px;
+    height: 100vh;
+    background: var(--card);
+    padding: 20px;
+    transform: translateX(-110%);
+    transition: .25s;
+    box-shadow: 10px 0 30px rgba(0,0,0,.2);
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.drawer-link {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    padding: 15px 8px;
+    font-weight: bold;
+    border-radius: 9px;
+}
+
+.drawer-link:hover {
+    background: var(--key);
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.4);
+    z-index: 90;
+    display: none;
+}
+
+.overlay.show {
+    display: block;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:430px) {
+
+    .section-grid {
+        gap: 9px;
+    }
+
+    .section-card {
+        min-height: 95px;
+    }
+
+    .section-icon {
+        font-size: 24px;
+    }
+
+    .section-name {
+        font-size: 12px;
+    }
+
+    .key {
+        height: 63px;
+    }
+
+    .result {
+        font-size: 45px;
+    }
+
+    .scientific-grid .key {
+        height: 49px;
+        font-size: 13px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- =====================================================
+     TOP BAR
+===================================================== -->
+
+<header class="topbar">
+
+    <button class="icon-button" id="menuButton">
+        ☰
+    </button>
+
+    <div class="logo">
+        <span>∑</span> Smart Calculator
+    </div>
+
+    <button class="icon-button" id="themeButton">
+        ☾
+    </button>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN APP
+===================================================== -->
+
+<main id="app"></main>
+
+
+<!-- =====================================================
+     BOTTOM NAV
+===================================================== -->
+
+<nav class="bottom-nav">
+
+    <button class="nav-button active"
+            data-page="calculator">
+
+        <span>▤</span>
+        <small>Calculator</small>
+
+    </button>
+
+    <button class="nav-button"
+            data-page="converter">
+
+        <span>▦</span>
+        <small>Convert</small>
+
+    </button>
+
+    <button class="nav-button"
+            data-page="finance">
+
+        <span>₹</span>
+        <small>Finance</small>
+
+    </button>
+
+    <button class="nav-button"
+            data-page="history">
+
+        <span>↶</span>
+        <small>History</small>
+
+    </button>
+
+</nav>
+
+</div>
+
+
+<!-- =====================================================
+     DRAWER
+===================================================== -->
+
+<aside class="drawer" id="drawer">
+
+    <div class="drawer-title">
+
+        <strong>Smart Calculator</strong>
+
+        <button class="icon-button"
+                id="closeDrawer">
+            ×
+        </button>
+
+    </div>
+
+    <button class="drawer-link"
+            data-page="calculator">
+        🧮 Calculator
+    </button>
+
+    <button class="drawer-link"
+            data-page="scientific">
+        🔬 Scientific
+    </button>
+
+    <button class="drawer-link"
+            data-page="converter">
+        📐 Converters
+    </button>
+
+    <button class="drawer-link"
+            data-page="finance">
+        💰 Finance
+    </button>
+
+    <button class="drawer-link"
+            data-page="health">
+        🩺 Health
+    </button>
+
+    <button class="drawer-link"
+            data-page="history">
+        🧾 History
+    </button>
+
+</aside>
+
+<div class="overlay" id="overlay"></div>
+
+
+<script>
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+let history =
+    JSON.parse(
+        localStorage.getItem("calculatorHistory")
+    ) || [];
+
+function addHistory(type, expression, result) {
+
+    history.unshift({
+        type,
+        expression,
+        result,
+        time: new Date().toLocaleString()
+    });
+
+    history =
+        history.slice(0, 100);
+
+    localStorage.setItem(
+        "calculatorHistory",
+        JSON.stringify(history)
+    );
+}
+
+
+/* =====================================================
+   BASIC CALCULATOR
+===================================================== */
+
+let expression = "";
+let answer = "0";
+let previous = "";
+
+function evaluateExpression(value) {
+
+    value = value
+        .replaceAll("×", "*")
+        .replaceAll("÷", "/")
+        .replaceAll("−", "-");
+
+    if (
+        !/^[0-9+\-*/%.()\s]+$/.test(value)
+    ) {
+        throw new Error();
+    }
+
+    const result =
+        Function(
+            `"use strict"; return (${value})`
+        )();
+
+    if (!Number.isFinite(result)) {
+        throw new Error();
+    }
+
+    return Number(
+        result.toFixed(12)
+    ).toString();
+}
+
+
+function basicKey(key) {
+
+    if (key === "AC") {
+
+        expression = "";
+        answer = "0";
+        previous = "";
+
+    }
+
+    else if (key === "DEL") {
+
+        expression =
+            expression.slice(0, -1);
+
+        answer =
+            expression || "0";
+
+    }
+
+    else if (key === "=") {
+
+        if (!expression) return;
+
+        try {
+
+            const oldExpression =
+                expression;
+
+            const result =
+                evaluateExpression(
+                    expression
+                );
+
+            previous =
+                oldExpression + " =";
+
+            answer = result;
+
+            expression = result;
+
+            addHistory(
+                "Basic",
+                oldExpression,
+                result
+            );
+
+        }
+
+        catch {
+
+            previous =
+                "Invalid calculation";
+
+            answer = "Error";
+
+        }
+
+    }
+
+    else {
+
+        expression += key;
+
+        answer = expression;
+
+    }
+
+    renderCalculator();
+}
+
+
+/* =====================================================
+   BASIC CALCULATOR SCREEN
+===================================================== */
+
+function renderCalculator() {
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="calculator">
+
+            <div class="display">
+
+                <div class="expression">
+                    ${previous}
+                </div>
+
+                <div class="result">
+                    ${answer}
+                </div>
+
+            </div>
+
+
+            <div class="keypad">
+
+                <button class="key ac"
+                    onclick="basicKey('AC')">
+                    AC
+                </button>
+
+                <button class="key"
+                    onclick="basicKey('DEL')">
+                    ⌫
+                </button>
+
+                <button class="key operator"
+                    onclick="basicKey('%')">
+                    %
+                </button>
+
+                <button class="key operator"
+                    onclick="basicKey('÷')">
+                    ÷
+                </button>
+
+
+                <button class="key"
+                    onclick="basicKey('7')">
+                    7
+                </button>
+
+                <button class="key"
+                    onclick="basicKey('8')">
+                    8
+                </button>
+
+                <button class="key"
+                    onclick="basicKey('9')">
+                    9
+                </button>
+
+                <button class="key operator"
+                    onclick="basicKey('×')">
+                    ×
+                </button>
+
+
+                <button class="key"
+                    onclick="basicKey('4')">
+                    4
+                </button>
+
+                <button class="key"
+                    onclick="basicKey('5')">
+                    5
+                </button>
+
+                <button class="key"
+                    onclick="basicKey('6')">
+                    6
+                </button>
+
+                <button class="key operator"
+                    onclick="basicKey('−')">
+                    −
+                </button>
+
+
+                <button class="key"
+                    onclick="basicKey('1')">
+                    1
+                </button>
+
+                <button class="key"
+                    onclick="basicKey('2')">
+                    2
+                </button>
+
+                <button class="key"
+                    onclick="basicKey('3')">
+                    3
+                </button>
+
+                <button class="key operator"
+                    onclick="basicKey('+')">
+                    +
+                </button>
+
+
+                <button class="key zero"
+                    onclick="basicKey('0')">
+                    0
+                </button>
+
+                <button class="key"
+                    onclick="basicKey('.')">
+                    .
+                </button>
+
+                <button class="key equal"
+                    onclick="basicKey('=')">
+                    =
+                </button>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+/* =====================================================
+   SCIENTIFIC CALCULATOR
+===================================================== */
+
+let sciExpression = "";
+let sciAnswer = "0";
+let sciPrevious = "";
+
+
+function scientificEvaluate(value) {
+
+    value = value
+        .replaceAll("π", "Math.PI")
+        .replace(/\be\b/g, "Math.E")
+        .replace(/sin\(/g, "Math.sin(")
+        .replace(/cos\(/g, "Math.cos(")
+        .replace(/tan\(/g, "Math.tan(")
+        .replace(/sqrt\(/g, "Math.sqrt(")
+        .replace(/log\(/g, "Math.log10(")
+        .replace(/ln\(/g, "Math.log(")
+        .replaceAll("^", "**");
+
+    if (
+        !/^[0-9+\-*/%().\sA-Za-z]+$/.test(value)
+    ) {
+        throw new Error();
+    }
+
+    const result =
+        Function(
+            `"use strict"; return (${value})`
+        )();
+
+    if (!Number.isFinite(result)) {
+        throw new Error();
+    }
+
+    return Number(
+        result.toFixed(12)
+    ).toString();
+}
+
+
+function scientificKey(key) {
+
+    if (key === "AC") {
+
+        sciExpression = "";
+        sciAnswer = "0";
+        sciPrevious = "";
+
+    }
+
+    else if (key === "DEL") {
+
+        sciExpression =
+            sciExpression.slice(0, -1);
+
+        sciAnswer =
+            sciExpression || "0";
+
+    }
+
+    else if (key === "=") {
+
+        try {
+
+            const old =
+                sciExpression;
+
+            const result =
+                scientificEvaluate(
+                    sciExpression
+                );
+
+            sciPrevious =
+                old + " =";
+
+            sciAnswer = result;
+            sciExpression = result;
+
+            addHistory(
+                "Scientific",
+                old,
+                result
+            );
+
+        }
+
+        catch {
+
+            sciPrevious =
+                "Invalid calculation";
+
+            sciAnswer = "Error";
+
+        }
+
+    }
+
+    else if (key === "sin" ||
+             key === "cos" ||
+             key === "tan" ||
+             key === "sqrt" ||
+             key === "log" ||
+             key === "ln") {
+
+        sciExpression +=
+            key + "(";
+
+        sciAnswer =
+            sciExpression;
+
+    }
+
+    else if (key === "x²") {
+
+        sciExpression += "^2";
+
+        sciAnswer =
+            sciExpression;
+
+    }
+
+    else if (key === "1/x") {
+
+        sciExpression =
+            `1/(${sciExpression || 1})`;
+
+        sciAnswer =
+            sciExpression;
+
+    }
+
+    else {
+
+        sciExpression += key;
+
+        sciAnswer =
+            sciExpression;
+
+    }
+
+    renderScientific();
+}
+
+
+function renderScientific() {
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="scientific">
+
+            <div class="back">
+
+                <button
+                    onclick="showPage('calculator')">
+                    ‹
+                </button>
+
+                <h2>Scientific</h2>
+
+            </div>
+
+
+            <div class="scientific-mode">
+
+                <span class="active">
+                    NORM
+                </span>
+
+                <span>
+                    MATH
+                </span>
+
+                <span>
+                    DEG
+                </span>
+
+            </div>
+
+
+            <div class="display scientific-display">
+
+                <div class="expression">
+                    ${sciPrevious}
+                </div>
+
+                <div class="result">
+                    ${sciAnswer}
+                </div>
+
+            </div>
+
+
+            <div class="scientific-grid">
+
+                ${[
+                    "AC","DEL","(",")","÷",
+                    "sin","cos","tan","sqrt","×",
+                    "log","ln","x²","^","−",
+                    "7","8","9","%","+",
+                    "4","5","6",".","=",
+                    "1","2","3","π","e",
+                    "0","1/x"
+                ].map(key => `
+
+                    <button
+                        class="key ${
+                            ["÷","×","−","+"]
+                            .includes(key)
+                            ? "operator"
+                            : ""
+                        } ${
+                            key === "AC"
+                            ? "ac"
+                            : ""
+                        } ${
+                            key === "="
+                            ? "equal"
+                            : ""
+                        }"
+                        onclick="scientificKey('${key}')">
+
+                        ${key}
+
+                    </button>
+
+                `).join("")}
+
+            </div>
+
+
+            <p class="scientific-info">
+
+                Trigonometric functions currently use
+                degree values. Example: sin(30) = 0.5.
+
+            </p>
+
+        </section>
+    `;
+}
+
+
+/* =====================================================
+   CONVERTER HOME
+===================================================== */
+
+function renderConverter() {
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="page">
+
+            <div class="back">
+
+                <button onclick="showPage('calculator')">
+                    ‹
+                </button>
+
+                <h2>Converters</h2>
+
+            </div>
+
+
+            <div class="section-grid">
+
+                ${tile(
+                    "↗",
+                    "Area",
+                    "area"
+                )}
+
+                ${tile(
+                    "▱",
+                    "Length",
+                    "length"
+                )}
+
+                ${tile(
+                    "MB",
+                    "Data",
+                    "data"
+                )}
+
+                ${tile(
+                    "%",
+                    "Discount",
+                    "discount"
+                )}
+
+                ${tile(
+                    "♟",
+                    "Mass",
+                    "mass"
+                )}
+
+                ${tile(
+                    "⚖",
+                    "BMI",
+                    "bmi"
+                )}
+
+                ${tile(
+                    "01",
+                    "Numeral System",
+                    "numeral"
+                )}
+
+                ${tile(
+                    "◔",
+                    "Speed",
+                    "speed"
+                )}
+
+                ${tile(
+                    "🌡",
+                    "Temperature",
+                    "temperature"
+                )}
+
+                ${tile(
+                    "◷",
+                    "Time",
+                    "time"
+                )}
+
+                ${tile(
+                    "◇",
+                    "Volume",
+                    "volume"
+                )}
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+function tile(icon, name, page) {
+
+    return `
+
+        <button
+            class="section-card"
+            onclick="showPage('${page}')">
+
+            <span class="section-icon">
+                ${icon}
+            </span>
+
+            <span class="section-name">
+                ${name}
+            </span>
+
+        </button>
+
+    `;
+}
+
+
+/* =====================================================
+   UNIT DATA
+===================================================== */
+
+const units = {
+
+    area: {
+        title: "Area",
+        values: {
+            "m²": 1,
+            "cm²": 0.0001,
+            "km²": 1000000,
+            "ft²": 0.092903,
+            "acre": 4046.856
+        }
+    },
+
+    length: {
+        title: "Length",
+        values: {
+            "Meter": 1,
+            "Centimeter": 0.01,
+            "Millimeter": 0.001,
+            "Kilometer": 1000,
+            "Inch": 0.0254,
+            "Feet": 0.3048,
+            "Mile": 1609.344
+        }
+    },
+
+    mass: {
+        title: "Mass",
+        values: {
+            "Kilogram": 1,
+            "Gram": 0.001,
+            "Milligram": 0.000001,
+            "Pound": 0.453592,
+            "Ounce": 0.0283495
+        }
+    },
+
+    data: {
+        title: "Data",
+        values: {
+            "Byte": 1,
+            "KB": 1024,
+            "MB": 1048576,
+            "GB": 1073741824,
+            "TB": 1099511627776
+        }
+    },
+
+    speed: {
+        title: "Speed",
+        values: {
+            "m/s": 1,
+            "km/h": 0.2777778,
+            "mph": 0.44704,
+            "knot": 0.514444
+        }
+    },
+
+    volume: {
+        title: "Volume",
+        values: {
+            "Liter": 1,
+            "Milliliter": 0.001,
+            "m³": 1000,
+            "Gallon": 3.785412
+        }
+    },
+
+    time: {
+        title: "Time",
+        values: {
+            "Second": 1,
+            "Minute": 60,
+            "Hour": 3600,
+            "Day": 86400,
+            "Week": 604800
+        }
+    }
+
+};
+
+
+/* =====================================================
+   UNIT CONVERTER
+===================================================== */
+
+function renderUnitConverter(type) {
+
+    const data =
+        units[type];
+
+    const names =
+        Object.keys(data.values);
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="page">
+
+            <div class="back">
+
+                <button
+                    onclick="showPage('converter')">
+                    ‹
+                </button>
+
+                <h2>
+                    ${data.title}
+                </h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="field">
+
+                    <label>
+                        Value
+                    </label>
+
+                    <input
+                        id="unitValue"
+                        type="number"
+                        placeholder="Enter value">
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        From
+                    </label>
+
+                    <select id="fromUnit">
+
+                        ${names.map(
+                            n =>
+                            `<option>${n}</option>`
+                        ).join("")}
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    class="swap"
+                    onclick="swapUnits()">
+
+                    ↕
+
+                </button>
+
+
+                <div class="field">
+
+                    <label>
+                        To
+                    </label>
+
+                    <select id="toUnit">
+
+                        ${names.map(
+                            n =>
+                            `<option>${n}</option>`
+                        ).join("")}
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    class="primary-button"
+                    onclick="convertUnit('${type}')">
+
+                    Convert
+
+                </button>
+
+
+                <div
+                    class="output"
+                    id="unitOutput">
+
+                    Enter a value
+
+                </div>
+
+            </div>
+
+        </section>
+    `;
+
+    if (names.length > 1) {
+
+        document.getElementById(
+            "toUnit"
+        ).selectedIndex = 1;
+
+    }
+}
+
+
+function swapUnits() {
+
+    const from =
+        document.getElementById(
+            "fromUnit"
+        );
+
+    const to =
+        document.getElementById(
+            "toUnit"
+        );
+
+    const temp =
+        from.value;
+
+    from.value =
+        to.value;
+
+    to.value =
+        temp;
+}
+
+
+function convertUnit(type) {
+
+    const value =
+        Number(
+            document.getElementById(
+                "unitValue"
+            ).value
+        );
+
+    const from =
+        document.getElementById(
+            "fromUnit"
+        ).value;
+
+    const to =
+        document.getElementById(
+            "toUnit"
+        ).value;
+
+    if (Number.isNaN(value)) {
+
+        document.getElementById(
+            "unitOutput"
+        ).textContent =
+            "Enter a valid number";
+
+        return;
+
+    }
+
+    const data =
+        units[type].values;
+
+    const base =
+        value * data[from];
+
+    const result =
+        base / data[to];
+
+    document.getElementById(
+        "unitOutput"
+    ).textContent =
+
+        `${value} ${from} = ${
+            Number(result.toFixed(8))
+        } ${to}`;
+
+}
+
+
+/* =====================================================
+   FINANCE HOME
+===================================================== */
+
+function renderFinance() {
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="page">
+
+            <div class="back">
+
+                <button onclick="showPage('calculator')">
+                    ‹
+                </button>
+
+                <h2>Finance</h2>
+
+            </div>
+
+
+            <div class="section-grid">
+
+                ${tile("▣","GST","gst")}
+
+                ${tile("$","Currency","currency")}
+
+                ${tile("%","Discount","discount")}
+
+                ${tile("％","Percentage","percentage")}
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+/* =====================================================
+   GST
+===================================================== */
+
+function renderGST() {
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="page">
+
+            <div class="back">
+
+                <button onclick="showPage('finance')">
+                    ‹
+                </button>
+
+                <h2>GST</h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="field">
+
+                    <label>
+                        Original Price
+                    </label>
+
+                    <input
+                        id="gstPrice"
+                        type="number"
+                        value="100">
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        GST Rate
+                    </label>
+
+                    <select id="gstRate">
+
+                        <option value="3">
+                            3%
+                        </option>
+
+                        <option value="5" selected>
+                            5%
+                        </option>
+
+                        <option value="12">
+                            12%
+                        </option>
+
+                        <option value="18">
+                            18%
+                        </option>
+
+                        <option value="28">
+                            28%
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    class="primary-button"
+                    onclick="calculateGST()">
+
+                    Calculate GST
+
+                </button>
+
+
+                <div
+                    class="output"
+                    id="gstOutput">
+
+                    Final Price: ₹105
+
+                </div>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+function calculateGST() {
+
+    const price =
+        Number(
+            document.getElementById(
+                "gstPrice"
+            ).value
+        );
+
+    const rate =
+        Number(
+            document.getElementById(
+                "gstRate"
+            ).value
+        );
+
+    const tax =
+        price * rate / 100;
+
+    const finalPrice =
+        price + tax;
+
+    document.getElementById(
+        "gstOutput"
+    ).innerHTML =
+
+        `Final Price: ₹${finalPrice.toFixed(2)}
+        <br>
+        <small>
+        GST: ₹${tax.toFixed(2)}
+        <br>
+        CGST / SGST: ₹${(tax / 2).toFixed(2)}
+        </small>`;
+}
+
+
+/* =====================================================
+   DISCOUNT
+===================================================== */
+
+function renderDiscount() {
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="page">
+
+            <div class="back">
+
+                <button onclick="showPage('finance')">
+                    ‹
+                </button>
+
+                <h2>Discount</h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="field">
+
+                    <label>
+                        Original Price
+                    </label>
+
+                    <input
+                        id="discountPrice"
+                        type="number">
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Discount %
+                    </label>
+
+                    <input
+                        id="discountRate"
+                        type="number"
+                        value="10">
+
+                </div>
+
+
+                <button
+                    class="primary-button"
+                    onclick="calculateDiscount()">
+
+                    Calculate
+
+                </button>
+
+
+                <div
+                    class="output"
+                    id="discountOutput">
+
+                    Enter values
+
+                </div>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+function calculateDiscount() {
+
+    const price =
+        Number(
+            document.getElementById(
+                "discountPrice"
+            ).value
+        );
+
+    const rate =
+        Number(
+            document.getElementById(
+                "discountRate"
+            ).value
+        );
+
+    const saved =
+        price * rate / 100;
+
+    const finalPrice =
+        price - saved;
+
+    document.getElementById(
+        "discountOutput"
+    ).innerHTML =
+
+        `Final Price: ₹${finalPrice.toFixed(2)}
+        <br>
+        <small>
+        You Save: ₹${saved.toFixed(2)}
+        </small>`;
+}
+
+
+/* =====================================================
+   BMI
+===================================================== */
+
+function renderBMI() {
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="page">
+
+            <div class="back">
+
+                <button onclick="showPage('converter')">
+                    ‹
+                </button>
+
+                <h2>BMI</h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="field">
+
+                    <label>
+                        Weight (kg)
+                    </label>
+
+                    <input
+                        id="bmiWeight"
+                        type="number">
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Height (cm)
+                    </label>
+
+                    <input
+                        id="bmiHeight"
+                        type="number">
+
+                </div>
+
+
+                <button
+                    class="primary-button"
+                    onclick="calculateBMI()">
+
+                    Calculate BMI
+
+                </button>
+
+
+                <div
+                    class="output"
+                    id="bmiOutput">
+
+                    Enter your details
+
+                </div>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+function calculateBMI() {
+
+    const weight =
+        Number(
+            document.getElementById(
+                "bmiWeight"
+            ).value
+        );
+
+    const height =
+        Number(
+            document.getElementById(
+                "bmiHeight"
+            ).value
+        );
+
+    if (
+        weight <= 0 ||
+        height <= 0
+    ) {
+
+        document.getElementById(
+            "bmiOutput"
+        ).textContent =
+            "Enter valid values";
+
+        return;
+
+    }
+
+    const meters =
+        height / 100;
+
+    const bmi =
+        weight /
+        (meters * meters);
+
+    document.getElementById(
+        "bmiOutput"
+    ).textContent =
+        `BMI = ${bmi.toFixed(2)}`;
+}
+
+
+/* =====================================================
+   AGE
+===================================================== */
+
+function renderAge() {
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="page">
+
+            <div class="back">
+
+                <button onclick="showPage('health')">
+                    ‹
+                </button>
+
+                <h2>Age Calculator</h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="field">
+
+                    <label>
+                        Date of Birth
+                    </label>
+
+                    <input
+                        id="birthDate"
+                        type="date">
+
+                </div>
+
+
+                <button
+                    class="primary-button"
+                    onclick="calculateAge()">
+
+                    Calculate Age
+
+                </button>
+
+
+                <div
+                    class="output"
+                    id="ageOutput">
+
+                    Select your date of birth
+
+                </div>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+function calculateAge() {
+
+    const birth =
+        new Date(
+            document.getElementById(
+                "birthDate"
+            ).value
+        );
+
+    const today =
+        new Date();
+
+    if (
+        Number.isNaN(
+            birth.getTime()
+        )
+    ) return;
+
+    let years =
+        today.getFullYear() -
+        birth.getFullYear();
+
+    let months =
+        today.getMonth() -
+        birth.getMonth();
+
+    let days =
+        today.getDate() -
+        birth.getDate();
+
+    if (days < 0) {
+
+        months--;
+
+        days +=
+            new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                0
+            ).getDate();
+
+    }
+
+    if (months < 0) {
+
+        years--;
+        months += 12;
+
+    }
+
+    document.getElementById(
+        "ageOutput"
+    ).textContent =
+
+        `${years} years, ${months} months, ${days} days`;
+}
+
+
+/* =====================================================
+   HEALTH HOME
+===================================================== */
+
+function renderHealth() {
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="page">
+
+            <div class="back">
+
+                <button onclick="showPage('calculator')">
+                    ‹
+                </button>
+
+                <h2>Health</h2>
+
+            </div>
+
+
+            <div class="section-grid">
+
+                ${tile(
+                    "⚖",
+                    "BMI",
+                    "bmi"
+                )}
+
+                ${tile(
+                    "🎂",
+                    "Age",
+                    "age"
+                )}
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+/* =====================================================
+   CURRENCY
+===================================================== */
+
+const currencyRates = {
+
+    USD: 1,
+    EUR: 0.92,
+    GBP: 0.79,
+    INR: 88.5,
+    JPY: 157,
+    AUD: 1.52,
+    CAD: 1.38
+
+};
+
+
+function renderCurrency() {
+
+    const currencies =
+        Object.keys(currencyRates);
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="page">
+
+            <div class="back">
+
+                <button onclick="showPage('finance')">
+                    ‹
+                </button>
+
+                <h2>Currency</h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="field">
+
+                    <label>
+                        Amount
+                    </label>
+
+                    <input
+                        id="currencyAmount"
+                        type="number"
+                        value="1">
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        From
+                    </label>
+
+                    <select id="currencyFrom">
+
+                        ${currencies.map(
+                            c =>
+                            `<option>${c}</option>`
+                        ).join("")}
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        To
+                    </label>
+
+                    <select id="currencyTo">
+
+                        ${currencies.map(
+                            c =>
+                            `<option>${c}</option>`
+                        ).join("")}
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    class="primary-button"
+                    onclick="convertCurrency()">
+
+                    Convert
+
+                </button>
+
+
+                <div
+                    class="output"
+                    id="currencyOutput">
+
+                    Enter amount
+
+                </div>
+
+                <p style="
+                    margin-top:12px;
+                    color:var(--muted);
+                    font-size:12px;
+                ">
+
+                    Demo exchange rates.
+                    Connect a live exchange-rate API
+                    for production use.
+
+                </p>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+function convertCurrency() {
+
+    const amount =
+        Number(
+            document.getElementById(
+                "currencyAmount"
+            ).value
+        );
+
+    const from =
+        document.getElementById(
+            "currencyFrom"
+        ).value;
+
+    const to =
+        document.getElementById(
+            "currencyTo"
+        ).value;
+
+    const result =
+        amount /
+        currencyRates[from] *
+        currencyRates[to];
+
+    document.getElementById(
+        "currencyOutput"
+    ).textContent =
+
+        `${amount} ${from} = ${
+            result.toFixed(4)
+        } ${to}`;
+}
+
+
+/* =====================================================
+   PERCENTAGE
+===================================================== */
+
+function renderPercentage() {
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="page">
+
+            <div class="back">
+
+                <button onclick="showPage('finance')">
+                    ‹
+                </button>
+
+                <h2>Percentage</h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="field">
+
+                    <label>
+                        Value
+                    </label>
+
+                    <input
+                        id="percentValue"
+                        type="number">
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Total
+                    </label>
+
+                    <input
+                        id="percentTotal"
+                        type="number">
+
+                </div>
+
+
+                <button
+                    class="primary-button"
+                    onclick="calculatePercentage()">
+
+                    Calculate
+
+                </button>
+
+
+                <div
+                    class="output"
+                    id="percentageOutput">
+
+                    Enter values
+
+                </div>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+function calculatePercentage() {
+
+    const value =
+        Number(
+            document.getElementById(
+                "percentValue"
+            ).value
+        );
+
+    const total =
+        Number(
+            document.getElementById(
+                "percentTotal"
+            ).value
+        );
+
+    if (!total) return;
+
+    const result =
+        value / total * 100;
+
+    document.getElementById(
+        "percentageOutput"
+    ).textContent =
+        `${result.toFixed(2)}%`;
+}
+
+
+/* =====================================================
+   HISTORY PAGE
+===================================================== */
+
+function renderHistory() {
+
+    const html =
+        history.length === 0
+
+        ? `<p style="
+             text-align:center;
+             color:var(--muted);
+             padding:30px;
+           ">
+           No calculation history.
+           </p>`
+
+        : history.map(item => `
+
+            <div class="history-item">
+
+                <div>
+
+                    <div class="history-expression">
+                        ${item.type}
+                    </div>
+
+                    <div>
+                        ${item.expression}
+                    </div>
+
+                    <div class="history-result">
+                        = ${item.result}
+                    </div>
+
+                </div>
+
+                <small style="
+                    color:var(--muted);
+                ">
+                    ${item.time}
+                </small>
+
+            </div>
+
+        `).join("");
+
+
+    document.getElementById("app")
+        .innerHTML = `
+
+        <section class="page">
+
+            <div class="back">
+
+                <button onclick="showPage('calculator')">
+                    ‹
+                </button>
+
+                <h2>History</h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <button
+                    class="clear-history"
+                    onclick="clearHistory()">
+
+                    🗑 Clear History
+
+                </button>
+
+                ${html}
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+function clearHistory() {
+
+    history = [];
+
+    localStorage.removeItem(
+        "calculatorHistory"
+    );
+
+    renderHistory();
+}
+
+
+/* =====================================================
+   PAGE ROUTER
+===================================================== */
+
+function showPage(page) {
+
+    if (page === "calculator")
+        renderCalculator();
+
+    else if (page === "scientific")
+        renderScientific();
+
+    else if (page === "converter")
+        renderConverter();
+
+    else if (page === "finance")
+        renderFinance();
+
+    else if (page === "health")
+        renderHealth();
+
+    else if (page === "history")
+        renderHistory();
+
+    else if (page === "gst")
+        renderGST();
+
+    else if (page === "currency")
+        renderCurrency();
+
+    else if (page === "discount")
+        renderDiscount();
+
+    else if (page === "percentage")
+        renderPercentage();
+
+    else if (page === "bmi")
+        renderBMI();
+
+    else if (page === "age")
+        renderAge();
+
+    else if (units[page])
+        renderUnitConverter(page);
+
+    window.scrollTo(0,0);
+}
+
+
+/* =====================================================
+   BOTTOM NAVIGATION
+===================================================== */
+
+document
+    .querySelectorAll(".nav-button")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                document
+                    .querySelectorAll(".nav-button")
+                    .forEach(b =>
+                        b.classList.remove(
+                            "active"
+                        )
+                    );
+
+                button.classList.add(
+                    "active"
+                );
+
+                showPage(
+                    button.dataset.page
+                );
+
+            }
+        );
+
+    });
+
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+const themeButton =
+    document.getElementById(
+        "themeButton"
+    );
+
+if (
+    localStorage.getItem("theme")
+    === "dark"
+) {
+
+    document.body.classList.add(
+        "dark"
+    );
+
+    themeButton.textContent = "☀";
+
+}
+
+
+themeButton.addEventListener(
+    "click",
+    () => {
+
+        document.body.classList.toggle(
+            "dark"
+        );
+
+        const dark =
+            document.body.classList.contains(
+                "dark"
+            );
+
+        localStorage.setItem(
+            "theme",
+            dark ? "dark" : "light"
+        );
+
+        themeButton.textContent =
+            dark ? "☀" : "☾";
+
+    }
+);
+
+
+/* =====================================================
+   DRAWER
+===================================================== */
+
+const drawer =
+    document.getElementById(
+        "drawer"
+    );
+
+const overlay =
+    document.getElementById(
+        "overlay"
+    );
+
+
+document
+    .getElementById("menuButton")
+    .onclick = () => {
+
+        drawer.classList.add(
+            "open"
+        );
+
+        overlay.classList.add(
+            "show"
+        );
+
+    };
+
+
+function closeDrawer() {
+
+    drawer.classList.remove(
+        "open"
+    );
+
+    overlay.classList.remove(
+        "show"
+    );
+
+}
+
+
+document
+    .getElementById("closeDrawer")
+    .onclick = closeDrawer;
+
+overlay.onclick = closeDrawer;
+
+
+document
+    .querySelectorAll(".drawer-link")
+    .forEach(button => {
+
+        button.onclick = () => {
+
+            showPage(
+                button.dataset.page
+            );
+
+            closeDrawer();
+
+        };
+
+    });
+
+
+/* =====================================================
+   KEYBOARD
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key >= "0" &&
+            event.key <= "9"
+        ) {
+
+            basicKey(event.key);
+
+        }
+
+        else if (
+            "+-*/.%()".includes(
+                event.key
+            )
+        ) {
+
+            basicKey(event.key);
+
+        }
+
+        else if (
+            event.key === "Enter"
+        ) {
+
+            basicKey("=");
+
+        }
+
+        else if (
+            event.key === "Backspace"
+        ) {
+
+            basicKey("DEL");
+
+        }
+
+        else if (
+            event.key === "Escape"
+        ) {
+
+            basicKey("AC");
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   START APPLICATION
+===================================================== */
+
+renderCalculator();
+
+</script>
+
+</body>
+</html>
